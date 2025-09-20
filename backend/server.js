@@ -14,17 +14,15 @@ app.use(express.json({ limit: '1mb' }));
 // Rate limiting
 app.use(rateLimit({
   windowMs: 60*60*1000,
-  max: 60,
-  standardHeaders: true,
-  legacyHeaders: false
+  max: 60
 }));
 
 const TMP = os.tmpdir();
-const API_KEY = process.env.API_KEY || '';
 
+// Utility to run commands
 function run(cmd, args, opts = {}) {
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'], ...opts });
+    const p = spawn(cmd, args, { stdio: ['ignore','pipe','pipe'], ...opts });
     let stdout = '', stderr = '';
     p.stdout.on('data', d => { stdout += d.toString(); });
     p.stderr.on('data', d => { stderr += d.toString(); });
@@ -33,41 +31,36 @@ function run(cmd, args, opts = {}) {
   });
 }
 
+// Download endpoint
 app.post('/download', async (req, res) => {
   try {
-    if (API_KEY) {
-      const key = req.headers['x-api-key'] || req.query.api_key;
-      if (!key || key !== API_KEY) return res.status(401).send('Invalid API key');
-    }
-
     const { url, format='video', range='full', start, end } = req.body;
     if (!url) return res.status(400).send('Missing url');
 
     const id = `${Date.now()}-${randomUUID()}`;
     const outPattern = path.join(TMP, `${id}.%(ext)s`);
 
-    // Use standalone yt-dlp binary
-    const ytdlpPath = '/usr/local/bin/yt-dlp';
+    // yt-dlp download
     const ytdlpArgs = [
       '-f', format === 'audio' ? 'bestaudio' : 'bestvideo+bestaudio/best',
       '-o', outPattern,
       url
     ];
 
-    console.log('Running yt-dlp with args:', ytdlpArgs.join(' '));
     try {
-      await run(ytdlpPath, ytdlpArgs);
+      await run('/usr/local/bin/yt-dlp', ytdlpArgs);
     } catch (err) {
       console.error('yt-dlp failed:', err.message);
-      console.log('TMP contents after yt-dlp:', fs.readdirSync(TMP));
       return res.status(500).send(`yt-dlp failed: ${err.message}`);
     }
 
-    const found = fs.readdirSync(TMP).find(f => f.startsWith(id));
+    const tmpFiles = fs.readdirSync(TMP);
+    const found = tmpFiles.find(f => f.startsWith(id));
     if (!found) return res.status(500).send('File not found — yt-dlp may have failed or video requires login');
+
     const downloadedPath = path.join(TMP, found);
 
-    // ffmpeg process
+    // ffmpeg processing
     const ext = format === 'audio' ? 'mp3' : 'mp4';
     const outputFilename = `${id}_out.${ext}`;
     const outputPath = path.join(process.cwd(), 'public', outputFilename);
@@ -78,11 +71,8 @@ app.post('/download', async (req, res) => {
     ffArgs.push('-i', downloadedPath);
     if (range === 'custom' && end) ffArgs.push('-to', end);
 
-    if (format === 'audio') {
-      ffArgs.push('-vn', '-acodec', 'libmp3lame', '-q:a', '2', outputPath);
-    } else {
-      ffArgs.push('-c', 'copy', outputPath);
-    }
+    if (format === 'audio') ffArgs.push('-vn','-acodec','libmp3lame','-q:a','2', outputPath);
+    else ffArgs.push('-c','copy', outputPath);
 
     await run('ffmpeg', ffArgs);
     try { fs.unlinkSync(downloadedPath); } catch {}
@@ -91,23 +81,22 @@ app.post('/download', async (req, res) => {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const downloadUrl = `${protocol}://${host}/file/${outputFilename}`;
 
-    return res.json({ downloadUrl });
+    res.json({ downloadUrl });
 
   } catch (err) {
-    console.error('Unexpected error in /download:', err);
+    console.error('Unexpected error:', err);
     res.status(500).send(err.message || 'Processing error');
   }
 });
 
+// Serve frontend
+app.use(express.static(path.join(process.cwd(), '../frontend')));
+app.get('*', (req,res) => {
+  res.sendFile(path.join(process.cwd(), '../frontend/index.html'));
+});
+
+// Serve downloads
 app.use('/file', express.static(path.join(process.cwd(), 'public')));
 
 const PORT = process.env.PORT || 3000;
-
-app.get('/debug-env', (req, res) => {
-  res.json({
-    PORT: process.env.PORT,
-    API_KEY: process.env.API_KEY ? "✅ set" : "❌ not set"
-  });
-});
-
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
