@@ -29,7 +29,7 @@ form.addEventListener('submit', async (e) => {
 
   try {
     // ✅ Use /clip route
-    const res = await fetch("https://ytclipper-backend.onrender.com/clip", {
+    const res = await fetch("https://ytclipper-backend.onrender.com/download", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
