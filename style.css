@@ -1,8 +1,8 @@
-/* Global dark theme */
+/* Global black & orange theme */
 body {
   font-family: system-ui, "Segoe UI", Roboto, Arial, sans-serif;
-  background-color: #121212;
-  color: #eee;
+  background-color: #000; /* black background */
+  color: #ffa500; /* orange text */
   margin: 0;
   padding: 0;
   display: flex;
@@ -14,9 +14,9 @@ body {
 .container {
   margin: 40px 20px;
   padding: 30px 40px;
-  background-color: #1e1e1e;
+  background-color: #111; /* dark container */
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 20px rgba(255,165,0,0.3); /* soft orange shadow */
   width: 100%;
   max-width: 500px;
 }
@@ -25,7 +25,7 @@ h1 {
   text-align: center;
   margin-bottom: 24px;
   font-size: 2rem;
-  color: #ffcc00;
+  color: #ffa500; /* bright orange */
 }
 
 input, select, button {
@@ -37,19 +37,19 @@ input, select, button {
   border-radius: 6px;
   border: 1px solid #333;
   background-color: #222;
-  color: #eee;
+  color: #ffa500; /* orange text */
   outline: none;
   box-sizing: border-box;
   transition: 0.2s;
 }
 
 input::placeholder {
-  color: #aaa;
+  color: #ffa50080; /* semi-transparent orange */
 }
 
 input:focus, select:focus {
-  border-color: #ffcc00;
-  box-shadow: 0 0 6px #ffcc00;
+  border-color: #ffa500;
+  box-shadow: 0 0 6px #ffa500;
 }
 
 select {
@@ -60,8 +60,8 @@ select {
 }
 
 button {
-  background-color: #ffcc00;
-  color: #121212;
+  background-color: #ffa500;
+  color: #000;
   border: none;
   font-weight: bold;
   cursor: pointer;
@@ -69,7 +69,7 @@ button {
 }
 
 button:hover {
-  background-color: #e6b800;
+  background-color: #ff9500; /* slightly darker orange */
 }
 
 label {
@@ -77,10 +77,57 @@ label {
   margin-bottom: 4px;
 }
 
+/* Radio group container */
 .radio-group {
   display: flex;
-  gap: 16px;
+  gap: 12px;
+  align-items: center;
   margin-bottom: 16px;
+}
+
+/* Smaller outer circle only */
+.radio-group input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 6px;   /* smaller outer circle */
+  height: 6px;
+  border: 2px solid #555;
+  border-radius: 50%;
+  background-color: #222;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Keep inner dot proportional */
+.radio-group input[type="radio"]:checked::before {
+  content: '';
+  display: block;
+  width: 6px;    /* inner dot remains same size */
+  height: 6px;
+  background-color: #ffa500;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Hover effect */
+.radio-group input[type="radio"]:hover {
+  border-color: #ffa500;
+}
+
+/* Keep label text unchanged */
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;  /* keep text size same */
 }
 
 #ts input {
@@ -89,7 +136,7 @@ label {
 }
 
 #status a {
-  color: #ffcc00;
+  color: #ffa500;
   text-decoration: none;
   font-weight: bold;
 }
