@@ -1,4 +1,4 @@
-const API_URL = 'https://api.finanaryugu.com/download'; //todo
+const API_URL = 'https://ytclipper-backend.onrender.com';
 
 const form = document.getElementById('dlForm');
 const ts = document.getElementById('ts');
