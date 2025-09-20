@@ -1,16 +1,24 @@
-const API_URL = 'https://ytclipper-backend.onrender.com';
+// ✅ Auto-detect backend
+const API_URL =
+  window.location.hostname.includes("github.io")
+    ? "https://ytclipper-backend.onrender.com"
+    : "http://localhost:3000";
 
 const form = document.getElementById('dlForm');
 const ts = document.getElementById('ts');
+
+// Show/hide custom timestamp inputs
 form.addEventListener('change', () => {
   ts.style.display = form.range.value === 'custom' ? 'block' : 'none';
 });
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const status = document.getElementById('status');
   status.innerText = 'Sending request...';
 
+  // Prepare payload
   const payload = {
     url: document.getElementById('url').value.trim(),
     format: document.getElementById('format').value,
@@ -20,11 +28,12 @@ form.addEventListener('submit', async (e) => {
   };
 
   try {
-    const res = await fetch(API_URL, {
+    // ✅ Use /clip route
+    const res = await fetch(`${API_URL}/clip`, {
       method: 'POST',
       headers: {
-        'Content-Type':'application/json',
-        // 'x-api-key': 'YOUR_API_KEY'
+        'Content-Type': 'application/json',
+        // 'x-api-key': 'YOUR_API_KEY' // not needed now
       },
       body: JSON.stringify(payload),
     });
