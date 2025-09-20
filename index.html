@@ -1,36 +1,41 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>YT Clipper</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
 </head>
-<body style="font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px">
-  <h1>YT Clipper</h1>
+<body>
+  <div class="container">
+    <h1>YT Clipper</h1>
 
-  <form id="dlForm">
-    <input id="url" name="url" placeholder="YouTube URL" required style="width:420px"/><br/><br/>
+    <form id="dlForm">
+      <label for="url">YouTube URL</label>
+      <input id="url" name="url" placeholder="Paste YouTube URL" required />
 
-    <label for="format">Output:</label>
-    <select id="format" name="format">
-      <option value="video">Video (mp4)</option>
-      <option value="audio">Audio (mp3)</option>
-    </select><br/><br/>
+      <label for="format">Output</label>
+      <select id="format" name="format">
+        <option value="video">Video (mp4)</option>
+        <option value="audio">Audio (mp3)</option>
+      </select>
 
-    <label>Range:</label>
-    <label><input type="radio" name="range" value="full" checked> Full</label>
-    <label><input type="radio" name="range" value="custom"> Custom</label><br/><br/>
+      <label>Range</label>
+      <div class="radio-group">
+        <label><input type="radio" name="range" value="full" checked> Full</label>
+        <label><input type="radio" name="range" value="custom"> Custom</label>
+      </div>
 
-    <div id="ts" style="display:none">
-      <input id="start" name="start" placeholder="Start (HH:MM:SS or seconds)"/>
-      <input id="end"   name="end"   placeholder="End (HH:MM:SS or seconds)"/>
-      <br/><br/>
-    </div>
+      <div id="ts" style="display:none">
+        <input id="start" name="start" placeholder="Start (HH:MM:SS or seconds)" />
+        <input id="end" name="end" placeholder="End (HH:MM:SS or seconds)" />
+      </div>
 
-    <button type="submit">Generate download</button>
-  </form>
+      <button type="submit">Generate Download</button>
+    </form>
 
-  <div id="status" style="margin-top:16px"></div>
+    <div id="status"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
